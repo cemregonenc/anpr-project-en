@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+venv/
+.env
+.DS_Store
+
+# Model weights (kept in Google Drive, not on GitHub)
+*.pt
+*.onnx
+
+# Large datasets (downloaded from Roboflow)
+data/dataset/
+runs/
+*.zip
+
+# Database
+*.db
