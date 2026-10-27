@@ -8,22 +8,26 @@ finds the number plate, reads the plate text, and saves the result.
 ## Folders
 | Folder | Contents |
 |---|---|
-| `data/` | Dataset config and hand-cropped plates for OCR testing (`data/plates/`) |
+| `data/` | Dataset config; `data/plates/` holds 50 labeled plate crops for OCR testing (`labels.csv` = ground truth) |
 | `models/` | Training scripts (`best.pt` is stored in Google Drive) |
 | `ocr/` | OCR and text-cleaning code |
 | `app/` | Streamlit app |
 | `docs/` | Report notes and `experiments.md` |
 
 ## Team
-- **A – Vision:** dataset, labeling, YOLO training, model testing
-- **B – Builder:** OCR, pipeline, app, database
+| Name | Role | Responsibilities |
+|---|---|---|
+| Doğukan Yeni | Vision | Dataset, labeling, YOLO training, model testing |
+| Cemre Gönenç | Builder | OCR, pipeline, Streamlit app, database |
+
+Both: testing, documentation, demos. We work separately during the week and combine work every Friday.
 
 ## Tools
 Python, Google Colab (GPU), Roboflow, YOLOv8 (Ultralytics), EasyOCR / PaddleOCR, OpenCV, Streamlit, SQLite
 
 ## Setup
 ```bash
-git clone https://github.com/cemregonenc/anpr-project.git
-cd anpr-project
+git clone https://github.com/cemregonenc/anpr-project-en.git
+cd anpr-project-en
 pip install -r requirements.txt
 ```
