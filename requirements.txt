@@ -1,6 +1,7 @@
 ultralytics
 opencv-python
-easyocr
+paddlepaddle
 paddleocr
+easyocr
 streamlit
 pandas
