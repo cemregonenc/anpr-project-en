@@ -1,0 +1,10 @@
+# ByteTrack settings for ANPR (Week 6). Based on ultralytics/cfg/trackers/bytetrack.yaml.
+# We only process every 3rd frame, so cars move more between processed frames:
+# keep lost tracks longer and accept looser matches to avoid one car getting several ids.
+tracker_type: bytetrack
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.4      # default 0.25 - fewer short fake tracks from weak detections
+track_buffer: 60           # default 30 - keep a lost car alive longer (occlusion, stride 3)
+match_thresh: 0.9          # default 0.8 - looser matching for bigger jumps between processed frames
+fuse_score: True
