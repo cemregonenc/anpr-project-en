@@ -1,7 +1,9 @@
 ultralytics
+lap>=0.5.12
 opencv-python
 paddlepaddle
 paddleocr
 easyocr
 streamlit
 pandas
+pyyaml

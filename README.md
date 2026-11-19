@@ -33,7 +33,10 @@ Python, Google Colab (GPU), Roboflow, YOLOv8 (Ultralytics), EasyOCR / PaddleOCR,
 | 3 | OCR ≥ 70% | 🟡 baseline already 80%; cleanup + Turkish pattern check added; run `ocr/week3_ocr_cleanup.ipynb` for final numbers |
 | 4 | MVP app + demo | 🟡 code ready: `app/pipeline.py` + Streamlit app; 10-image test + demo still to do (`docs/demo_plan.md`) |
 
-Details: `docs/experiments.md`, `docs/checklist_weeks2-4.md`.
+| 5 | mAP ≥ 0.75, OCR ≥ 80% | 🟡 code ready: data download + merge + retrain, bigger OCR test set, hard-30, sharpening/thresholding — run the notebooks |
+| 6 | Video, no duplicates | 🟡 code ready: tracking (ByteTrack), plate voting, save once, Video tab — test on a 1-minute video |
+
+Details: `docs/experiments.md`, `docs/checklist_weeks2-4.md`, `docs/checklist_weeks5-6.md`, data: `docs/data_sources.md`.
 
 ## Setup
 ```bash
@@ -44,6 +47,7 @@ pip install -r requirements.txt
 Copy `plate_best.pt` and `cls_best.pt` from Google Drive `ANPR/models/` into `models/`, then:
 ```bash
 streamlit run app/app.py               # web app
-python app/pipeline.py photo.jpg       # command line
-python ocr/test_plate_text.py          # OCR text-rule tests
+python app/pipeline.py photo.jpg       # command line, image
+python app/video_pipeline.py traffic.mp4 annotated.mp4   # command line, video
+python ocr/test_plate_text.py && python ocr/test_week5.py && python ocr/test_week6.py   # tests
 ```

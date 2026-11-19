@@ -11,3 +11,8 @@ Confirm or replace each item after the 10-image test (`docs/week4_test_log.md`).
 1. **Blurry / dark plates** are read wrong even after cleanup. → Week 5: try sharpening and thresholding, build a 30-image "hard plates" set.
 2. **Two-line and non-standard plates** (and foreign plates in the dataset) do not fit the Turkish pattern. → handle two-line layout, mark foreign plates as "unknown format" instead of forcing a fix.
 3. **Plate crop edges** (frame, TR band, stickers) add extra characters. → tune crop padding with Doğukan, keep the "drop one extra character" rule only when the pattern then fits.
+
+## Progress (Weeks 5–6)
+- Vision 1 (small plates): more Turkish plates + Open Images hard cases + augmentation → `models/week5_data_and_retrain.ipynb`
+- Builder 1 (blurry/dark): sharpening, CLAHE, thresholding as fallback → `ocr/week5_hard_plates.ipynb`
+- Builder 2 (two-line plates): reader joins rows top to bottom; character datasets include two-line plates for testing
