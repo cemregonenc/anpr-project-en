@@ -13,3 +13,5 @@ Vehicles are found with the COCO-pretrained `yolov8n.pt` (downloads automaticall
 |---|---|---|
 | `crop_plates.py` | 3 | Crop plates from any image/folder → crops + `crops.csv` |
 | `week3_plate_crops.ipynb` | 2–3 | Test on 20 new images, make auto crops for OCR, optional yolov8s retrain |
+| `merge_datasets.py` | 5 | Merge YOLO datasets into one plate-only set, drop duplicates |
+| `week5_data_and_retrain.ipynb` | 5 | Download Turkish plate sets + Open Images hard cases, retrain plate_v2, old vs new |
