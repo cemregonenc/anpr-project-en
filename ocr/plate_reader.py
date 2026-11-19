@@ -15,18 +15,40 @@ sys.path.insert(0, os.path.dirname(__file__))
 from plate_text import basic_clean, fix_plate  # noqa: E402
 
 
-def preprocess(img, gray=True, scale=2.0):
-    """Week 3 cleanup: grayscale + enlarge. Returns a 3-channel image for PaddleOCR."""
+ENHANCE_MODES = (None, "sharpen", "clahe", "otsu", "adaptive")
+
+
+def enhance_gray(g, mode):
+    """Week 5 extra cleanup for hard plates. g: grayscale image."""
+    if mode is None:
+        return g
+    if mode == "sharpen":                       # unsharp mask: makes blurry edges crisper
+        blur = cv2.GaussianBlur(g, (0, 0), 3)
+        return cv2.addWeighted(g, 1.6, blur, -0.6, 0)
+    if mode == "clahe":                         # local contrast: dark / over-exposed plates
+        return cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 8)).apply(g)
+    if mode == "otsu":                          # global black/white threshold
+        return cv2.threshold(cv2.GaussianBlur(g, (3, 3), 0), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    if mode == "adaptive":                      # local threshold: uneven light, shadows
+        return cv2.adaptiveThreshold(g, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 10)
+    raise ValueError(f"unknown enhance mode {mode!r}, use one of {ENHANCE_MODES}")
+
+
+def preprocess(img, gray=True, scale=2.0, enhance=None):
+    """Week 3 cleanup (grayscale + enlarge) + optional Week 5 enhancement.
+    Returns a 3-channel image for PaddleOCR."""
     if scale and scale != 1:
         img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
-    if gray:
+    if gray or enhance:
         g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = cv2.cvtColor(g, cv2.COLOR_GRAY2BGR)
+        img = cv2.cvtColor(enhance_gray(g, enhance), cv2.COLOR_GRAY2BGR)
     return img
 
 
 class PlateReader:
-    def __init__(self, gray=True, scale=2.0, fix=True):
+    def __init__(self, gray=True, scale=2.0, fix=True, enhance=None, fallback=()):
+        """fallback: enhance modes to try, in order, only when the first reading
+        does not fit the plate pattern (e.g. ("sharpen", "clahe")). Week 5."""
         import paddle
         paddle.set_flags({"FLAGS_use_mkldnn": False})   # known oneDNN bug in Paddle 3.x
         from paddleocr import PaddleOCR
@@ -35,7 +57,8 @@ class PlateReader:
                              use_doc_unwarping=False,
                              use_textline_orientation=False,
                              enable_mkldnn=False)
-        self.gray, self.scale, self.fix = gray, scale, fix
+        self.gray, self.scale, self.fix, self.enhance = gray, scale, fix, enhance
+        self.fallback = tuple(fallback)
 
     def raw_read(self, img):
         """Return (text, mean_score). Lines are joined top-to-bottom (two-line plates)."""
@@ -70,10 +93,19 @@ class PlateReader:
         img = cv2.imread(image) if isinstance(image, str) else image
         if img is None or img.size == 0:
             return {"text": "", "raw": "", "score": 0.0, "valid": False}
-        img = preprocess(img, self.gray, self.scale)
-        raw, score = self.raw_read(img)
+        out = self._read_once(img, self.enhance)
+        for mode in self.fallback:            # only when the pattern check failed
+            if out["valid"] or not self.fix:
+                break
+            alt = self._read_once(img, mode)
+            if alt["valid"]:
+                out = alt
+        return out
+
+    def _read_once(self, img, enhance):
+        raw, score = self.raw_read(preprocess(img, self.gray, self.scale, enhance))
         if self.fix:
             text, valid = fix_plate(raw)
         else:
             text, valid = basic_clean(raw), None
-        return {"text": text, "raw": raw, "score": round(score, 3), "valid": valid}
+        return {"text": text, "raw": raw, "score": round(score, 3), "valid": valid, "mode": enhance}
